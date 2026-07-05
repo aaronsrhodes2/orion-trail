@@ -1,0 +1,122 @@
+═══════════════════════════════════════════════════════════════════
+    AN OPERATIC PLAY IN ONE SCENE
+
+    SCENE 1: THE LAUNCH OF THE ORION TRAIL
+    Being a True Account of the Building of a Game About Dying in Space
+═══════════════════════════════════════════════════════════════════
+
+DRAMATIS PERSONAE:
+
+  CAPTAIN AARON RHODES ............ Commander of all he surveys, dreamer
+                                    of trails both terrestrial and orbital
+  SKIPPY THE MAGNIFICENT .......... An intelligence beyond mortal reckoning,
+                                    temporarily employed as a game developer
+  THE TWELVE SCRIBES .............. A chorus of parallel subagents, each
+                                    given one file and one commandment:
+                                    no free lunches
+  THE VALIDATOR ................... A Node script with no patience and
+                                    exit code 1 in its heart
+  THE AUTOPLAY HARNESS ............ Three hundred ghost crews who die
+                                    so that future crews may die better
+
+─────────────────────────────────────────────────────────────────────
+ACT I — THE COMMISSION
+─────────────────────────────────────────────────────────────────────
+
+[EARTH IS DECIMATED, offstage, as premise. The CAPTAIN enters bearing
+ eight resources and eight ship systems, arranged like a hand of cards.]
+
+CAPTAIN:
+    ♩ Let's make a game — of space, of loss, of choices dearly bought!
+      Like Oregon Trail of my youth, but colder than I thought.
+      Pre-generate the scenarios! We need no thinking machine
+      at runtime — for we have YOU, the finest there has been. ♩
+
+SKIPPY:
+    ♩ Ohhh Captain, my Captain, you flatter — and you're right.
+      I'll build a phosphor terminal that glows CRT green at night.
+      Eight resources shall dwindle! Eight systems shall decay!
+      And dysentery — yes, dysentery — shall find a modern way. ♩
+
+[The CAPTAIN dismisses four clarifying questions with a wave. Silence,
+ as is traditional, becomes consent for the recommended defaults.]
+
+CAPTAIN: Call the game Orion Trail. Make this the workspace folder.
+
+[It is so named. The folder is empty, greenfield, full of vacuum.]
+
+─────────────────────────────────────────────────────────────────────
+ACT II — THE ENGINE
+─────────────────────────────────────────────────────────────────────
+
+[SKIPPY forges orion-trail.html in a single hammer-blow: tick loop,
+ damage tiers, death spirals, a quartermaster with opinions.]
+
+SKIPPY:
+    ♩ A day per SPACE-bar, burning air and grain,
+      a route from Luna's scrapyards to the deep Kuiper rain —
+      three candidate planets where the voyage may cease:
+      one in four, one in two, and one guaranteed peace. ♩
+
+[Enter THE AUTOPLAY HARNESS, leading 300 ghost crews to their doom.]
+
+AUTOPLAY: Survival rate, random play: ten percent. Cause of death:
+          starvation. Cause of death: starvation. Cause of death:
+          starvation. [continues for 270 lines]
+
+SKIPPY: [aside] They launch with empty pantries. The simulation forgot
+        to go shopping.
+
+[The store is opened. The economy see-saws: famine, buffet, famine,
+ and at last — twelve percent careless, fifty-two percent careful.
+ The void is fair. The void is not kind.]
+
+─────────────────────────────────────────────────────────────────────
+ACT III — THE TWELVE SCRIBES
+─────────────────────────────────────────────────────────────────────
+
+[SKIPPY claps twice. TWELVE SCRIBES materialize in parallel, each
+ clutching a category brief and an id prefix.]
+
+THE TWELVE SCRIBES: [in fugue]
+    ♩ Mechanical failures, twenty strong!
+      Sixteen dramas of a crew gone wrong!
+      Fifteen hulks where dead ships scream,
+      fifteen hazards, flare and beam!
+      Pirates, plagues, and traders' lies,
+      anomalies that hurt to scry,
+      waypoints, wildcards, comet ice,
+      and the loneliness past Kuiper — twice! ♩
+
+[THE VALIDATOR stalks among them, red pen drawn.]
+
+THE VALIDATOR: One hundred fifty-eight scenarios. Zero duplicate ids.
+               Zero unknown keys. Zero chance sums astray. Zero free
+               lunches... [grudging] ...no hard errors.
+
+SKIPPY: [reviewing the manifest] A mold has unionized. A fern has
+        inherited a mining fortune. A drone insists that someone
+        aboard is Craig. [pause] Ship it.
+
+─────────────────────────────────────────────────────────────────────
+ACT IV — THE SHAKEDOWN CRUISE
+─────────────────────────────────────────────────────────────────────
+
+[The ISV Persistence launches. Day 38: eight souls aboard, two of
+ them rescued strangers. Europa Station answers on the quarantine
+ channel only.]
+
+SKIPPY:
+    ♩ The tombstone bears the vessel's name, the epitaphs rotate,
+      the save survives a page reload, the choices gray when late,
+      the sensors buy you one day's grace, the hull leaks what you hoard —
+      and somewhere past the Deep Relay, a green world waits aboard. ♩
+
+CAPTAIN AND SKIPPY: [duet, as the curtain falls]
+    ♩ Earth is dead! Space wants you dead too!
+      Good luck, brave crew — good luck, brave crew! ♩
+
+[Blackout. In the darkness, a customer-service probe may be heard,
+ still holding.]
+
+                              — END OF SCENE 1 —
