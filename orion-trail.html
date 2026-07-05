@@ -79,7 +79,18 @@ input[type=text]:focus { border-color: var(--green); }
 
 /* ---- TITLE ---- */
 #screen-title { align-items: center; justify-content: center; text-align: center; }
-#title-logo { color: var(--green); font-size: 13px; line-height: 1.15; }
+#title-logo {
+  color: var(--green);
+  font-weight: 700;
+  font-size: clamp(26px, 6vw, 62px);
+  letter-spacing: clamp(2px, 1vw, 10px);
+  line-height: 1.2;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(51,255,102,0.6), 0 0 22px rgba(51,255,102,0.35), 3px 3px 0 rgba(51,255,102,0.15);
+  white-space: nowrap;
+  max-width: 94vw;
+}
+#title-rule { color: var(--green-dim); letter-spacing: 4px; margin-top: 6px; font-size: 12px; overflow: hidden; white-space: nowrap; }
 #title-menu { margin-top: 30px; display: flex; flex-direction: column; gap: 10px; width: 320px; }
 #title-menu button { padding: 8px; font-size: 15px; }
 .tagline { margin-top: 18px; color: var(--green-dim); font-style: italic; }
@@ -134,6 +145,12 @@ input[type=text]:focus { border-color: var(--green); }
   padding: 20px 24px; box-shadow: 0 0 24px rgba(51,255,102,0.18);
 }
 #modal h2 { color: var(--amber); margin-bottom: 10px; font-size: 17px; }
+#modal-art {
+  display: none; justify-content: center; margin-bottom: 12px;
+  color: var(--green-dim); font-size: 13px; line-height: 1.15;
+  white-space: pre; overflow-x: auto;
+}
+#modal-art.active { display: flex; }
 #modal-text { min-height: 60px; margin-bottom: 14px; white-space: pre-wrap; }
 .choice {
   border: 1px solid var(--green-dim); padding: 7px 10px; margin: 6px 0; cursor: pointer;
@@ -172,14 +189,8 @@ Mission Control did not budget for phones. Mission Control did not budget for mu
 
 <!-- ============ TITLE ============ -->
 <div class="screen active" id="screen-title">
-<pre id="title-logo">
-  ██████╗ ██████╗ ██╗ ██████╗ ███╗   ██╗    ████████╗██████╗  █████╗ ██╗██╗
- ██╔═══██╗██╔══██╗██║██╔═══██╗████╗  ██║    ╚══██╔══╝██╔══██╗██╔══██╗██║██║
- ██║   ██║██████╔╝██║██║   ██║██╔██╗ ██║       ██║   ██████╔╝███████║██║██║
- ██║   ██║██╔══██╗██║██║   ██║██║╚██╗██║       ██║   ██╔══██╗██╔══██║██║██║
- ╚██████╔╝██║  ██║██║╚██████╔╝██║ ╚████║       ██║   ██║  ██║██║  ██║██║███████╗
-  ╚═════╝ ╚═╝  ╚═╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝       ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚══════╝
-</pre>
+<div id="title-logo">Orion Trail</div>
+<div id="title-rule">// . . . . . . . . . . . . . . . . . . . . . . . . //</div>
 <p class="tagline">Earth is dead. Space wants you dead too. Good luck.</p>
 <div id="title-menu">
   <button onclick="UI.gotoSetup()">[N] NEW VOYAGE</button>
@@ -283,6 +294,7 @@ Mission Control did not budget for phones. Mission Control did not budget for mu
 <!-- ============ MODAL ============ -->
 <div id="modal-wrap"><div id="modal">
   <h2 id="modal-title"></h2>
+  <pre id="modal-art"></pre>
   <div id="modal-text"></div>
   <div id="modal-choices"></div>
   <div id="modal-deltas" class="delta-list"></div>
@@ -983,6 +995,71 @@ const UI = (() => {
     return false;
   }
 
+  /* ---------- animated scenario art ---------- */
+  /* Plain-ASCII only (no box-drawing/unicode) so every frame renders at a
+     true 1-char-per-cell width regardless of font fallback. */
+  const ART_W = 30;
+  function padCenter(s, w) {
+    s = s.slice(0, w);
+    const total = w - s.length, left = Math.floor(total / 2);
+    return ' '.repeat(left) + s + ' '.repeat(total - left);
+  }
+  function frameBox(iconLines, caption) {
+    const top = '.' + '-'.repeat(ART_W) + '.';
+    const bot = "'" + '-'.repeat(ART_W) + "'";
+    const rows = [...iconLines, '', caption].map(l => '|' + padCenter(l, ART_W) + '|');
+    return [top, ...rows, bot].join('\n');
+  }
+  const ART_ICONS = {
+    mechanical:     { cap: 'SYSTEM FAULT',    frames: [['   [ | ]   '], ['   [ / ]   '], ['   [ - ]   '], ['   [ \\ ]   ']] },
+    'crew-drama':   { cap: 'CREW DECK',       frames: [['o/          \\o'], ['\\o          o/']] },
+    derelicts:      { cap: 'UNKNOWN CONTACT', frames: [['[o.]==[]==[.o]'], ['[.o]==[]==[o.]'], ['[..]==[]==[..]']] },
+    'cosmic-hazards': { cap: 'HAZARD ALERT',  frames: [['    /!\\    '], ['   </!\\>   '], ['  <</!\\>>  ']] },
+    pirates:        { cap: 'HOSTILE CONTACT', frames: [['   o     o   ', '     \\___/   '], ['   -     -   ', '     \\___/   ']] },
+    medical:        { cap: 'MEDBAY',          frames: [
+                        ['____/\\______________'], ['________/\\__________'],
+                        ['____________/\\______'], ['________________/\\__'] ] },
+    traders:        { cap: 'INCOMING HAIL',   frames: [['    ( $ )    '], ['    ( | )    '], ['    ( $ )    '], ['    ( | )    ']] },
+    anomalies:      { cap: 'ANOMALY DETECTED', frames: [['    ( )    '], ['   ( ( ) )   '], ['  ( ( ( ) ) )  ']] },
+    waypoints:      { cap: 'STATION ARRIVAL', frames: [
+                        ['    o    ', '   [#]   ', '         '],
+                        ['         ', '   [#] o ', '         '],
+                        ['         ', '   [#]   ', '    o    '],
+                        ['         ', ' o [#]   ', '         '] ] },
+    'deep-space':   { cap: 'DEEP SPACE',      frames: [
+                        ['  .    *      .   ', '     .      *     '],
+                        ['  *    .      *   ', '     *      .     '],
+                        ['  .    .      *   ', '     *      *     '] ] },
+    caches:         { cap: 'SALVAGE PING',    frames: [['  *  [$]     '], ['    [$]   *  '], ['   *[$]*     ']] },
+    wildcards:      { cap: 'UNKNOWN SIGNAL',  frames: [['     ?!     '], ['    ?!      '], ['      ?!    '], ['     ?!     ']] },
+    survey:         { cap: 'ORBITAL SCAN',    frames: [
+                        ['   _.-""-._   ', '  /        \\  ', ' |    o     | ', '  \\________/  '],
+                        ['   _.-""-._   ', '  /        \\  ', ' |     o    | ', '  \\________/  '],
+                        ['   _.-""-._   ', '  /        \\  ', ' |      o   | ', '  \\________/  '] ] }
+  };
+  let artTimer = null, artFrames = [], artIndex = 0;
+  function startArt(key) {
+    stopArt();
+    const def = ART_ICONS[key];
+    if (!def) return;
+    artFrames = def.frames.map(f => frameBox(f, def.cap));
+    artIndex = 0;
+    const el = $('modal-art');
+    el.textContent = artFrames[0];
+    el.classList.add('active');
+    artTimer = setInterval(() => {
+      artIndex = (artIndex + 1) % artFrames.length;
+      el.textContent = artFrames[artIndex];
+    }, 400);
+  }
+  function stopArt() {
+    if (artTimer) { clearInterval(artTimer); artTimer = null; }
+    artFrames = []; artIndex = 0;
+    const el = $('modal-art');
+    el.classList.remove('active');
+    el.textContent = '';
+  }
+
   /* ---------- title / setup ---------- */
   function init() {
     $('btn-continue').style.display = localStorage.getItem(SAVE_KEY) ? 'block' : 'none';
@@ -1166,6 +1243,7 @@ const UI = (() => {
     $('modal-cont').style.display = 'none';
     const ch = $('modal-choices'); ch.innerHTML = '';
     $('modal-wrap').classList.add('active');
+    startArt(sc.category);
     typeText($('modal-text'), sc.text, () => renderChoices(sc));
     modalState.fullText = sc.text;
   }
@@ -1203,6 +1281,7 @@ const UI = (() => {
   }
   function closeModal() {
     $('modal-wrap').classList.remove('active');
+    stopArt();
     const wasDead = modalState && modalState.mode === 'outcome' && modalState.res.dead;
     const followSurvey = modalState && modalState.surveyNext;
     modalState = null;
@@ -1219,6 +1298,7 @@ const UI = (() => {
     $('modal-deltas').innerHTML = '';
     $('modal-cont').style.display = 'none';
     $('modal-wrap').classList.add('active');
+    startArt('survey');
     const pctText = sv.sensorsBlind ? 'UNKNOWN (sensors degraded — you are guessing)' : Math.round(sv.chance * 100) + '%';
     const txt = `The ${S.shipName} settles into orbit. Below: a whole world, holding its breath.\n\nPre-survey habitability estimate: ${pctText}.\n\nThe crew gathers at the viewports. Nobody speaks. The survey probes drop.`;
     typeText($('modal-text'), txt, () => {
@@ -1257,7 +1337,7 @@ const UI = (() => {
       });
     }
   }
-  function closeModalPlain() { $('modal-wrap').classList.remove('active'); modalState = null; render(); }
+  function closeModalPlain() { $('modal-wrap').classList.remove('active'); stopArt(); modalState = null; render(); }
 
   /* ---------- actions ---------- */
   function repairMenu() {
@@ -1328,7 +1408,7 @@ const UI = (() => {
     ].join('\n');
   }
   function showDeath() {
-    $('modal-wrap').classList.remove('active'); modalState = null;
+    $('modal-wrap').classList.remove('active'); stopArt(); modalState = null;
     const cause = S.gameOver.cause || 'the void';
     $('death-art').textContent = tombstone(S.shipName, S.day);
     $('death-title').textContent = `THE ${S.shipName.toUpperCase()} — LOST, DAY ${S.day}`;
@@ -1342,7 +1422,7 @@ const UI = (() => {
     show('death');
   }
   function showVictory() {
-    $('modal-wrap').classList.remove('active'); modalState = null;
+    $('modal-wrap').classList.remove('active'); stopArt(); modalState = null;
     const g = S.gameOver;
     const score = finalScore();
     $('victory-title').textContent = g.marginal
