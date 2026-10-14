@@ -41,3 +41,13 @@ SKIPPY: Orion Trail it is. Engine built, validated, and balanced. Twelve paralle
 - misc/SESSION_LOG.md (this file)
 
 ---
+
+## SESSION 2 — October 14, 2026
+**Players:** Captain Aaron Rhodes, Skippy the Magnificent
+
+- **Phone/tablet audit** (Playwright at 320/390/820/1180 px, touch emulation) of the Oct 12 phone pass. Fixed: PACE/RATIONS buttons had a box nested in a box; travel screen opened scrolled down after setup; long modal titles wrapped badly at 320 px. Added: two-column portrait-tablet layout and big tap targets for touch tablets in landscape.
+- **Click-only name entry:** random buttons on the vessel name and every crew name, plus RANDOMIZE ALL CREW.
+- **Encounter variety:** +32 scenarios in 4 new files (`personal` crew moments, `first-contact`, `ship-ai`, `echoes` consequences) → 190 total. Engine: name tokens with a featured crew member who actually dies, `minDead/maxDead/minDay/maxDay` gates, `surveyBonus`, same-category anti-repeat, quiet-day ambient log lines. Three flags the game set but never used (`europa_passenger`, `carrying_the_mail`, `relay_routes`) now have payoffs.
+- Validator: new files, token rules, flag wiring checks. 0 errors, 0 warnings.
+- Measured over 400 careful-play runs: distinct scenarios seen 146 → 175; same category twice in a row 8.3% → 2.6%. Balance (Officer): careless 17% survival, careful 46%.
+- `orion-trail.html` normalized back to LF (the Oct 12 commit had converted it to CRLF, unlike every other file).

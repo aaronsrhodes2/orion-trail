@@ -7,6 +7,11 @@ An Oregon Trail-style space survival game. One HTML file, no server, no build st
 ## Play
 
 Open `orion-trail.html` in any browser (double-click works — it runs from `file://`).
+To host it, serve `orion-trail.html` and the `scenarios/` folder side by side from any static web root — no server code, no build.
+
+**Phones and tablets:** every key has a tap. Below 900 px the panels stack and the action bar sticks to the bottom;
+portrait tablets get two columns; touch tablets in landscape get big tap targets. Every text field (vessel name, each crew member)
+has a 🎲 random button, plus RANDOMIZE ALL CREW, so a whole voyage can be set up without a keyboard.
 
 - **[SPACE]** advances one day. The crew burns oxygen, water, and food; the ship burns power and fuel.
 - Events strike en route. Every choice trades something for something else. There are no free lunches; there is barely lunch.
@@ -19,7 +24,7 @@ Open `orion-trail.html` in any browser (double-click works — it runs from `fil
 
 ```
 orion-trail.html      engine + UI + CSS. Everything except scenario data.
-scenarios/*.js        the scenario library, 12 themed files
+scenarios/*.js        the scenario library, 16 themed files (190 scenarios)
 tools/validate.js     schema + balance checker: node tools/validate.js
 misc/SESSION_LOG.md   build history
 ```
@@ -77,6 +82,17 @@ then run `node tools/validate.js`.
   ]
 }
 ```
+
+### Variation tools (engine-supported)
+
+- **Name tokens** in `title`, `text`, choice `label`/`detail` and outcome `text`: `{crew}` (a random living crew member, fixed for the
+  whole scenario), `{crew2}` (a different one), `{dead}` (most recent casualty), `{ship}`. If an outcome kills crew in a scenario that
+  uses tokens, it kills `{crew}`. Use `requires.resourceAbove.crew: 1` with `{crew}`, `: 2` with `{crew2}`, `requires.minDead: 1` with `{dead}`
+  (the validator enforces these).
+- **More `requires` gates:** `minDead` `maxDead` `minDay` `maxDay`.
+- **`surveyBonus: 0.1`** on an outcome: raises the habitability odds on the candidate-planet surveys (capped at +0.30 total).
+- **Flag chains:** `echoes.js` pays off earlier choices. The validator errors if a scenario consumes a flag nothing sets and warns on dead-end flags.
+- **Anti-repeat:** the same category twice in a row is weighted ×0.35. **Quiet days** sometimes log a flavour line (`AMBIENT` in the engine).
 
 ### House rules (validator-enforced where possible)
 

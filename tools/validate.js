@@ -14,7 +14,8 @@ const WAYPOINTS = ['luna','mars','ceres','europa','titan','kuiper','relay','glie
 const PREFIX = { 'mechanical.js':'mech-', 'crew-drama.js':'crew-', 'derelicts.js':'der-',
   'cosmic-hazards.js':'haz-', 'pirates.js':'pir-', 'medical.js':'med-', 'traders.js':'trd-',
   'anomalies.js':'anom-', 'waypoints.js':'wp-', 'deep-space.js':['deep-','adrift-'],
-  'caches.js':'cache-', 'wildcards.js':'wild-' };
+  'caches.js':'cache-', 'wildcards.js':'wild-',
+  'personal.js':'pers-', 'first-contact.js':'alien-', 'ship-ai.js':'ai-', 'echoes.js':'echo-' };
 
 const errors = [], warnings = [];
 const err = (id, msg) => errors.push(`[${id}] ${msg}`);
@@ -81,6 +82,31 @@ for (const [file, list] of Object.entries(byFile)) {
       }
     }
   }
+}
+
+/* ---- flag wiring: every consumed flag must be set somewhere; set-but-never-consumed is a dead end ---- */
+{
+  const setBy = {}, usedBy = {};
+  for (const sc of SCENARIOS) {
+    const useFlags = r => { if (!r) return; for (const k of ['requiresFlag', 'forbidsFlag']) if (r[k]) (usedBy[r[k]] = usedBy[r[k]] || []).push(sc.id); };
+    useFlags(sc.requires);
+    for (const c of sc.choices || []) { useFlags(c.requires); for (const o of c.outcomes || []) if (o.flag) (setBy[o.flag] = setBy[o.flag] || []).push(sc.id); }
+  }
+  for (const f of Object.keys(usedBy)) if (!setBy[f]) err(usedBy[f][0], `consumes flag "${f}" that no scenario sets`);
+  for (const f of Object.keys(setBy)) if (!usedBy[f]) warn(setBy[f][0], `sets flag "${f}" that no scenario consumes (dead-end flag)`);
+}
+
+/* ---- name tokens + engine-extended fields ---- */
+for (const sc of SCENARIOS) {
+  const blob = JSON.stringify(sc);
+  const toks = [...blob.matchAll(/\{([a-z0-9]+)\}/g)].map(m => m[1]);
+  for (const t of toks) if (!['crew', 'crew2', 'dead', 'ship'].includes(t)) err(sc.id, `unknown text token {${t}}`);
+  const minC = sc.requires && sc.requires.resourceAbove ? sc.requires.resourceAbove.crew : undefined;
+  if (toks.includes('crew2') && !(minC >= 2)) err(sc.id, 'uses {crew2} without requires.resourceAbove.crew >= 2');
+  if (toks.includes('crew') && !(minC >= 1)) warn(sc.id, 'uses {crew} without requires.resourceAbove.crew >= 1');
+  if (toks.includes('dead') && !(sc.requires && sc.requires.minDead >= 1)) err(sc.id, 'uses {dead} without requires.minDead >= 1');
+  for (const c of sc.choices || []) for (const o of c.outcomes || [])
+    if (o.surveyBonus != null && !(o.surveyBonus > 0 && o.surveyBonus <= 0.3)) err(sc.id, 'surveyBonus must be in (0, 0.3]');
 }
 
 /* ---- waypoint set-piece coverage (candidates are engine-run surveys) ---- */
