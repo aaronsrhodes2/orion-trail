@@ -15,7 +15,8 @@ const PREFIX = { 'mechanical.js':'mech-', 'crew-drama.js':'crew-', 'derelicts.js
   'cosmic-hazards.js':'haz-', 'pirates.js':'pir-', 'medical.js':'med-', 'traders.js':'trd-',
   'anomalies.js':'anom-', 'waypoints.js':'wp-', 'deep-space.js':['deep-','adrift-'],
   'caches.js':'cache-', 'wildcards.js':'wild-',
-  'personal.js':'pers-', 'first-contact.js':'alien-', 'ship-ai.js':'ai-', 'echoes.js':'echo-' };
+  'personal.js':'pers-', 'first-contact.js':'alien-', 'ship-ai.js':'ai-', 'echoes.js':'echo-',
+  'bizarre.js':'odd-', 'horror.js':'dread-', 'wonders.js':'wonder-' };
 
 const errors = [], warnings = [];
 const err = (id, msg) => errors.push(`[${id}] ${msg}`);
@@ -105,8 +106,10 @@ for (const sc of SCENARIOS) {
   if (toks.includes('crew2') && !(minC >= 2)) err(sc.id, 'uses {crew2} without requires.resourceAbove.crew >= 2');
   if (toks.includes('crew') && !(minC >= 1)) warn(sc.id, 'uses {crew} without requires.resourceAbove.crew >= 1');
   if (toks.includes('dead') && !(sc.requires && sc.requires.minDead >= 1)) err(sc.id, 'uses {dead} without requires.minDead >= 1');
-  for (const c of sc.choices || []) for (const o of c.outcomes || [])
+  for (const c of sc.choices || []) for (const o of c.outcomes || []) {
+    if (o.advance != null && !(o.advance > 0 && o.advance <= 6)) err(sc.id, 'advance must be in (0, 6]');
     if (o.surveyBonus != null && !(o.surveyBonus > 0 && o.surveyBonus <= 0.3)) err(sc.id, 'surveyBonus must be in (0, 0.3]');
+  }
 }
 
 /* ---- waypoint set-piece coverage (candidates are engine-run surveys) ---- */
@@ -149,7 +152,7 @@ for (const sc of SCENARIOS) {
   // no-free-lunch: a choice whose expected deltas are all >= 0 AND worst case has no downside
   // (requirement-gated choices are exempt — the gate is the price)
   for (const [ci, c] of sc.choices.entries()) {
-    if (c.requires) continue;
+    if (c.requires || sc.category === 'wonders') continue;   // wonders are meant to be generous
     const exp = expectedDeltas(c);
     const allUp = Object.entries(exp).every(([k, v]) => v >= 0);
     if (allUp && worstCase(c) >= 0 && Object.keys(exp).length > 0)

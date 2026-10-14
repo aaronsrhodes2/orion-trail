@@ -226,6 +226,16 @@ button, .choice, #action-bar span, #modal-cont, #modal-close { -webkit-tap-highl
 .name-row input { flex: 1 1 auto; min-width: 0; }
 button.rnd { flex: 0 0 auto; padding: 4px 8px; font-size: 12px; white-space: nowrap; }
 .name-row button.rnd { min-width: 44px; }
+/* category moods: a horror modal is wrong, a bizarre one is cold, a wonder one is gold */
+#modal.horror { border-color: var(--red); box-shadow: 0 0 28px rgba(255,51,51,0.22); }
+#modal.horror h2 { color: var(--red); text-shadow: 0 0 6px rgba(255,51,51,0.6); animation: dread 4s steps(1) infinite; }
+#modal.horror #modal-art { color: #a33; }
+#modal.bizarre { border-color: var(--cyan); box-shadow: 0 0 24px rgba(76,201,240,0.2); }
+#modal.bizarre h2 { color: var(--cyan); }
+#modal.wonders { border-color: var(--amber); box-shadow: 0 0 30px rgba(255,176,0,0.28); }
+#modal.wonders h2 { color: #ffd45e; text-shadow: 0 0 8px rgba(255,200,60,0.7); }
+@keyframes dread { 0%, 92%, 96% { opacity: 1; transform: none; } 93% { opacity: 0.35; transform: translateX(2px); } 95% { opacity: 0.7; transform: translateX(-3px); } }
+@media (prefers-reduced-motion: reduce) { #modal.horror h2 { animation: none; } }
 /* tablets in portrait: resources and systems side by side under the route */
 @media (min-width: 601px) and (max-width: 900px) {
   #travel-main { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
@@ -394,6 +404,9 @@ Mission Control did not budget for wristwatches. Mission Control did not budget 
 <script src="scenarios/personal.js"></script>
 <script src="scenarios/first-contact.js"></script>
 <script src="scenarios/ship-ai.js"></script>
+<script src="scenarios/bizarre.js"></script>
+<script src="scenarios/horror.js"></script>
+<script src="scenarios/wonders.js"></script>
 <script src="scenarios/echoes.js"></script>
 
 <script>
@@ -634,6 +647,8 @@ function pickWeighted(pool) {
   const weightOf = sc => {
     let w = sc.weight != null ? sc.weight : 1;
     if (sc.category === 'crew-drama' && moraleT >= 1) w *= (moraleT >= 2 ? 4 : 2);
+    if (sc.category === 'horror') { if (moraleT >= 1) w *= 1.5; if (currentZone() === 'deep') w *= 1.3; }   // dread feeds on a shaky crew and an empty sky
+    if (sc.category === 'wonders' && moraleT >= 2) w *= 2;                                              // and the universe pities the broken
     if (sc.category === S.lastCategory) w *= 0.35;   // variety: the same kind of trouble twice in a row is rarer
     return w;
   };
@@ -877,6 +892,7 @@ function resolveChoice(scenario, choiceIdx) {
   if (o.damage) Object.entries(o.damage).forEach(([k, v]) => { addSys(k, v); track(SYS_LABEL[k], v, true); });
   if (o.repair) Object.entries(o.repair).forEach(([k, v]) => { addSys(k, v); track(SYS_LABEL[k], v, true); });
   if (o.crewDeath) { const d = killCrew(fillText(scenario.title).toLowerCase(), fa()); if (d) deaths.push(d); }
+  if (o.advance) { S.legProgress += o.advance; track('DISTANCE', o.advance); }
   if (o.surveyBonus) S.surveyBonus = Math.min(0.3, (S.surveyBonus || 0) + o.surveyBonus);
   if (o.flag) S.flags[o.flag] = true;
   if (o.delayDays) { for (let i = 0; i < o.delayDays; i++) { S.day++; burnDay(false); } }
@@ -1202,6 +1218,9 @@ const UI = (() => {
     personal:       { cap: 'CREW QUARTERS',   frames: [['   o  |  o   ', '  /|\\ | /|\\  '], ['   o  |  o   ', '  \\|/ | \\|/  ']] },
     'first-contact':{ cap: 'FIRST CONTACT',   frames: [['  <o>  ....  <O>  '], ['  <o>  ::::  <O>  '], ['  <o>  ....  <O>  '], ['  <O>  ::::  <o>  ']] },
     'ship-ai':      { cap: 'SHIP COMPUTER',   frames: [['   [ o_o ]   '], ['   [ o_- ]   '], ['   [ o_o ]   '], ['   [ -_o ]   ']] },
+    bizarre:        { cap: 'ANOMALOUS',       frames: [['   ~ ? ~   '], ['  ~~ ? ~~  '], [' ~~~ ? ~~~ '], ['  ~~ ? ~~  ']] },
+    horror:         { cap: 'DO NOT LOOK',     frames: [['  .-""-.  ', ' ( -  - ) ', "  '-..-'  "], ['  .-""-.  ', ' ( o  o ) ', "  '-..-'  "], ['  .-""-.  ', ' ( O  O ) ', "  '-..-'  "], ['  .-""-.  ', ' ( @  @ ) ', "  '-..-'  "]] },
+    wonders:        { cap: 'WONDER',          frames: [['    *    ', '  * + *  ', '    *    '], ['   .*.   ', ' * +*+ * ', '   .*.   '], ['  * . *  ', '. + * + .', '  * . *  ']] },
     echoes:         { cap: 'AFTERSHOCK',      frames: [['   ( )   '], ['  (( ))  '], [' ((( ))) '], ['  (( ))  ']] },
     survey:         { cap: 'ORBITAL SCAN',    frames: [
                         ['   _.-""-._   ', '  /        \\  ', ' |    o     | ', '  \\________/  '],
@@ -1226,7 +1245,7 @@ const UI = (() => {
   function stopArt() {
     if (artTimer) { clearInterval(artTimer); artTimer = null; }
     artFrames = []; artIndex = 0;
-    $('modal').classList.remove('closable');
+    $('modal').classList.remove('closable', 'horror', 'bizarre', 'wonders');
     const el = $('modal-art');
     el.classList.remove('active');
     el.textContent = '';
@@ -1455,6 +1474,7 @@ const UI = (() => {
     const ch = $('modal-choices'); ch.innerHTML = '';
     $('modal-wrap').classList.add('active');
     startArt(sc.category);
+    ['horror', 'bizarre', 'wonders'].forEach(c => $('modal').classList.toggle(c, sc.category === c));
     const txt = fillText(sc.text);
     typeText($('modal-text'), txt, () => renderChoices(sc));
     modalState.fullText = txt;

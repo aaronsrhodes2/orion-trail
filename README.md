@@ -24,7 +24,7 @@ has a 🎲 random button, plus RANDOMIZE ALL CREW, so a whole voyage can be set 
 
 ```
 orion-trail.html      engine + UI + CSS. Everything except scenario data.
-scenarios/*.js        the scenario library, 16 themed files (190 scenarios)
+scenarios/*.js        the scenario library, 19 themed files (227 scenarios)
 tools/validate.js     schema + balance checker: node tools/validate.js
 misc/SESSION_LOG.md   build history
 ```
@@ -90,6 +90,8 @@ then run `node tools/validate.js`.
   uses tokens, it kills `{crew}`. Use `requires.resourceAbove.crew: 1` with `{crew}`, `: 2` with `{crew2}`, `requires.minDead: 1` with `{dead}`
   (the validator enforces these).
 - **More `requires` gates:** `minDead` `maxDead` `minDay` `maxDay`.
+- **`advance: N`** on an outcome (N ≤ 6): jumps the ship N units along the current leg for free — wind at your back. Shows as `DISTANCE +N`.
+- **Moods:** `horror` modals go red and flicker, `bizarre` go cyan, `wonders` go gold. Horror is weighted up for shaky crews and the deep leg; wonders double for a broken crew. `wonders` is exempt from the no-free-lunch warning on purpose.
 - **`surveyBonus: 0.1`** on an outcome: raises the habitability odds on the candidate-planet surveys (capped at +0.30 total).
 - **Flag chains:** `echoes.js` pays off earlier choices. The validator errors if a scenario consumes a flag nothing sets and warns on dead-end flags.
 - **Anti-repeat:** the same category twice in a row is weighted ×0.35. **Quiet days** sometimes log a flavour line (`AMBIENT` in the engine).

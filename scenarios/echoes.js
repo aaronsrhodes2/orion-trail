@@ -280,5 +280,49 @@ SCENARIOS.push(
       ]
     }
   ]
+},
+{
+  id: "echo-008",
+  title: "It's Fine",
+  category: "echoes",
+  weight: 2,
+  zones: ["outer", "deep"],
+  requires: { requiresFlag: "warned_by_self", resourceAbove: { crew: 1 } },
+  text: "{crew} straightens up from the aft panel, wipes their hands, and says it: 'It's fine.' Behind them, very faintly, there is a hiss. {crew} is smiling the way you smile at a funeral. The note in your pocket weighs a great deal more than paper.",
+  choices: [
+    {
+      label: "Take {crew} at their word",
+      outcomes: [
+        { chance: 0.5, text: "It is fine. It is, in fact, entirely fine. {crew} gives you a long, hurt look as you walk away, and you carry that look for days.",
+          damage: { morale: -4 } },
+        { chance: 0.5, text: "It was not fine. A coolant line, slowly bleeding, for a day and a half before anyone smells it. You carried the warning in your pocket the whole time. You did not trust it. That is the only thing you will remember.",
+          effects: { oxygen: -12 }, damage: { hull: -15, morale: -6 } }
+      ]
+    },
+    {
+      label: "Inspect the panel yourself",
+      detail: "A day, and some tact.",
+      outcomes: [
+        { chance: 0.7, text: "A hairline crack in a seal, only just starting. You catch it in time and fix it with your own hands. {crew} is quietly, awkwardly relieved, and a little hurt, and does not say so.",
+          repair: { lifeSupport: 10 }, damage: { morale: -4 }, delayDays: 1 },
+        { chance: 0.3, text: "Nothing. A perfectly good panel. {crew} says nothing, and a good deal of nothing, over the next week, and you do not blame them.",
+          damage: { morale: -10 }, delayDays: 1 }
+      ]
+    },
+    {
+      label: "Relieve {crew} and lock the panel",
+      detail: "Trust the note. Not the smile.",
+      cost: { parts: -1 },
+      requires: { resources: { parts: 1 } },
+      outcomes: [
+        { chance: 0.45, text: "You were right. The panel was rigged to fail slowly, by someone who had every reason to want it, in a way that only a careful hand could have made look fine. You never find out who. {crew} is shaken, and grateful, and cannot say why.",
+          repair: { hull: 12, lifeSupport: 10 }, damage: { morale: -6 } },
+        { chance: 0.35, text: "You were wrong. {crew} stares at you, white and furious, and is not wrong either. The crew takes sides. It is not a good week.",
+          damage: { morale: -14 } },
+        { chance: 0.2, text: "{crew} laughs. It is the wrong laugh, a half-beat too long, from a throat that has not decided how. By evening {crew} has gone very quiet, and then, at ship's midnight, very still.",
+          damage: { morale: -14 }, crewDeath: true }
+      ]
+    }
+  ]
 }
 );
